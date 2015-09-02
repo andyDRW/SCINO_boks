@@ -62,7 +62,6 @@ public class FragmentCategoryList extends Fragment {
                             bundle.putInt("category", category.getId());
                         }
                     }
-                    //   detouchLastFragment();
                     mFragmentBookList.setArguments(bundle);
                     mFTrans.replace(R.id.fragment, mFragmentBookList);
                     mFTrans.commit();

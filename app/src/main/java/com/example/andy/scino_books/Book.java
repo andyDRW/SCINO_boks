@@ -35,6 +35,9 @@ public class Book {
     public void setCategory(Category bookCategory){
         category=bookCategory;
     }
+    public Category getCategory(){
+        return category;
+    }
 
     public int getId(){
         return Id;
