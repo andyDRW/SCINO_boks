@@ -1,9 +1,7 @@
 package com.example.andy.scino_books;
 
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +16,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Created by andy on 24.08.15.
+ * Created by andy on 04.09.15.
  */
-public class FragmentAddBook extends DialogFragment {
+public class FragmentEditBook extends DialogFragment {
     private Button mButtonOk;
     private Book mBook;
     private Button mButtonCancel;
@@ -33,14 +31,37 @@ public class FragmentAddBook extends DialogFragment {
     private ArrayList<Category> mCategories;
     private ArrayAdapter<String> mSpinnerAdapter;
     private Category mSelectedCategory;
+    private Category mCurrentCategory;
+    private String mCurrentCategoryName;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle bundle=getArguments();
+        final int bookId=bundle.getInt("book");
+        try {
+            mBook =(Book)HelperFactory.getHelper().getBookDAO().queryForId(bookId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            mCurrentCategory=mBook.getCategory();
+            HelperFactory.getHelper().getCathegoryDAO().refresh(mCurrentCategory);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(mCurrentCategory!=null) {
+            mCurrentCategoryName = mCurrentCategory.getName();
+        }
         View v=inflater.inflate(R.layout.fragment_add_book, null);
         mEditName=(EditText)v.findViewById(R.id.editTextBookName);
+        mEditName.setText(mBook.getName());
         mEditDescription=(EditText)v.findViewById(R.id.editTextBookDescription);
+        mEditDescription.setText(mBook.getDescription());
         mEditAuthor=(EditText)v.findViewById(R.id.editTextBookAuthor);
+        mEditAuthor.setText(mBook.getAuthor());
         mCheckBoxIsRead=(CheckBox)v.findViewById(R.id.checkBoxBookRead);
+        mCheckBoxIsRead.setChecked(mBook.getRead());
         mSpinnerCategory=(Spinner)v.findViewById(R.id.spinnerBookCategory);
         try {
             mCategories= (ArrayList<Category>) HelperFactory.getHelper().getCathegoryDAO().getAllCategories();
@@ -49,11 +70,16 @@ public class FragmentAddBook extends DialogFragment {
             return v;
         }
         mCategoryNames=new ArrayList<String>();
+        if(mCurrentCategoryName!=null) {
+            mCategoryNames.add(mCurrentCategoryName);
+        }
         mCategoryNames.add(getString(R.string.no_category));
         for(Category category:mCategories){
-            mCategoryNames.add(category.getName());
+            String name=category.getName();
+            if(!name.equals(mCurrentCategoryName)) {
+                mCategoryNames.add(name);
+            }
         }
-
         mSpinnerAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),R.layout.spinner_item, mCategoryNames);
         mSpinnerCategory.setAdapter(mSpinnerAdapter);
         mSpinnerCategory.setPrompt(getString(R.string.category_str));
@@ -88,15 +114,21 @@ public class FragmentAddBook extends DialogFragment {
                 String bookAuthor = mEditAuthor.getText().toString();
                 boolean bookIsRead = mCheckBoxIsRead.isChecked();
                 if (mSelectedCategory == null) {
-                    mBook = new Book(bookName, bookAuthor, bookDescription, bookIsRead);
+                    try {
+                        HelperFactory.getHelper().getBookDAO().updateBookNulCategory(bookId, bookName, bookDescription, bookAuthor, bookIsRead);
+                        dismiss();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    mBook = new Book(bookName, bookAuthor, bookDescription, bookIsRead,mSelectedCategory);
-                }
-                try {
-                    HelperFactory.getHelper().getBookDAO().create(mBook);
-                    dismiss();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+
+                    try {
+                        //HelperFactory.getHelper().getBookDAO().create(mBook);
+                        HelperFactory.getHelper().getBookDAO().updateBook(bookId, bookName, bookDescription, bookAuthor, bookIsRead, mSelectedCategory);
+                        dismiss();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -110,3 +142,4 @@ public class FragmentAddBook extends DialogFragment {
         return  v;
     }
 }
+

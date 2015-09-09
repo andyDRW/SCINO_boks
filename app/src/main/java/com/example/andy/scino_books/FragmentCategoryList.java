@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.sql.SQLException;
@@ -21,7 +23,9 @@ public class FragmentCategoryList extends Fragment {
     private ListView mCategoriesListView;
     private  ArrayList<String> list;
     private ArrayList<Category> mCategoriesList;
+    private boolean mDualPane;
     private FragmentBookList mFragmentBookList;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
@@ -41,30 +45,55 @@ public class FragmentCategoryList extends Fragment {
             mCategoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                     mFTrans = getActivity().getFragmentManager().beginTransaction();
-                    mFragmentBookList= new FragmentBookList();
-                    Bundle bundle = new Bundle();
                     String categoryName=list.get(position);
                     if(categoryName.equals(getString(R.string.no_category))) {
-                        bundle.putInt("category", Integer.MIN_VALUE);
+                        mFragmentBookList= new FragmentBookListNoCategory();
+                        mFTrans = getActivity().getFragmentManager().beginTransaction();
+                        mFTrans.replace(R.id.fragment, mFragmentBookList)
+                                .commit();
                     }
                     else {
-                        if(categoryName.equals(getString(R.string.all))){
-                            bundle.putInt("category", Integer.MAX_VALUE);
-                        }
-                        else{
+                        if (categoryName.equals(getString(R.string.all))) {
+                            mFragmentBookList = new FragmentBookListAll();
+
+                            mFTrans = getActivity().getFragmentManager().beginTransaction();
+                            mFTrans.replace(R.id.fragment, mFragmentBookList)
+                                    .commit();
+                        } else {
                             Category category = null;
+                            Bundle bundle = new Bundle();
                             try {
                                 category = (Category) HelperFactory.getHelper().getCathegoryDAO().getCategoryByName(categoryName);
+                                mFragmentBookList = new FragmentBookList();
+                                mFTrans = getActivity().getFragmentManager().beginTransaction();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                             bundle.putInt("category", category.getId());
+                            mFragmentBookList.setArguments(bundle);
+                            if(mDualPane){
+                                FrameLayout frameLayout2 = (FrameLayout) getActivity().findViewById(R.id.fragment_2);
+                                FrameLayout frameLayout = (FrameLayout) getActivity().findViewById(R.id.fragment);
+                                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.MATCH_PARENT, 0.5f);
+                                LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.MATCH_PARENT, 0.5f);
+                                frameLayout.setLayoutParams(param);
+                                frameLayout2.setLayoutParams(param2);
+                                mFTrans.replace(R.id.fragment, mFragmentBookList)
+                                        .commit();
+                            }
+                            else {
+                                mFTrans.replace(R.id.fragment, mFragmentBookList)
+                                        .commit();
+                            }
+
                         }
                     }
-                    mFragmentBookList.setArguments(bundle);
-                    mFTrans.replace(R.id.fragment, mFragmentBookList);
-                    mFTrans.commit();
                 }
             });
         } catch (SQLException e) {
@@ -72,4 +101,8 @@ public class FragmentCategoryList extends Fragment {
         }
         return v;
     }
+    public FragmentBookList getFragmentBookList(){
+        return mFragmentBookList;
+    }
+
 }

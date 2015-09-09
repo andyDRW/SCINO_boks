@@ -29,7 +29,8 @@ public class Book {
         return read;
     }
 
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign=true, foreignAutoRefresh=true, canBeNull=true,
+            maxForeignAutoRefreshLevel=3)
     private Category category;
 
     public void setCategory(Category bookCategory){
@@ -43,15 +44,22 @@ public class Book {
         return Id;
     }
 
+    public String getAuthor(){return author;}
+
+    public String getDescription(){return  description;}
+
     public String getName(){
         return name;
     }
 
-    public Book(String bookName, String bookAuthor, String bookDescription, boolean bookReaded){
+    public Book(String bookName, String bookAuthor, String bookDescription, boolean bookRead){
         name=bookName;
         author=bookAuthor;
         description=bookDescription;
-        read=bookReaded;
+        read=bookRead;
+    }
+    public void setRead(boolean bookRead){
+        read=bookRead;
     }
     public Book(String bookName, String bookAuthor, String bookDescription, boolean bookReaded,Category bookCategory){
         name=bookName;

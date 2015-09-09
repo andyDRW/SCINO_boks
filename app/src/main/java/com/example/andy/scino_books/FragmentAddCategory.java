@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Created by andy on 24.08.15.
  */
-public class FragmentAddCategory extends FragmentScinoBooks {
+public class FragmentAddCategory extends DialogFragment {
     private Button mButtonOk;
     private Button mButtonCancel;
     private EditText mEditName;

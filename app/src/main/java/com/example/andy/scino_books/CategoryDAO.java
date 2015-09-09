@@ -5,6 +5,7 @@ import android.database.SQLException;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.util.List;
@@ -29,6 +30,19 @@ public class CategoryDAO extends BaseDaoImpl<Category, Integer> {
         List<Category> categories =query(preparedQuery);
         Category category=categories.get(0);
         return category;
+    }
+    public void updateCategory(String name,String description,int id){
+        UpdateBuilder<Category, Integer> updateBuilder=updateBuilder();
+
+        try {
+            updateBuilder.where().eq("Id",id);
+            updateBuilder.updateColumnValue("name", name);
+            updateBuilder.updateColumnValue("description",description);
+            updateBuilder.update();
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
