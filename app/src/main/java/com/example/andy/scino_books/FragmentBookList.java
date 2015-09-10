@@ -1,15 +1,12 @@
 package com.example.andy.scino_books;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,6 +28,10 @@ public class FragmentBookList extends DialogFragment {
     protected ArrayList<Book> mBooksList;
     protected ListView mBookListView;
     protected FragmentBookList itself;
+
+    public FragmentBookList(){
+        this.setRetainInstance(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +60,7 @@ public class FragmentBookList extends DialogFragment {
                     mFragmentShowBook = new FragmentShowBook();
                     mFragmentShowBook.setArguments(bundle);
                     mFTrans = getActivity().getFragmentManager().beginTransaction();
-                    if(DualPane.getDualPane()){
+                    if(DualPaneSingleton.getDualPane()){
                         mFTrans
                                 .replace(R.id.fragment_2,mFragmentShowBook)
                                 .commit();

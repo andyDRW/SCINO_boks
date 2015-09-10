@@ -17,13 +17,11 @@ import java.util.ArrayList;
 
 /**
  * Created by andy on 30.08.15.
+ * list of categories
  */
 public class FragmentCategoryList extends Fragment {
     private FragmentTransaction mFTrans;
-    private ListView mCategoriesListView;
     private  ArrayList<String> list;
-    private ArrayList<Category> mCategoriesList;
-    private boolean mDualPane;
     private FragmentBookList mFragmentBookList;
 
     @Override
@@ -32,29 +30,29 @@ public class FragmentCategoryList extends Fragment {
         View v=inflater.inflate(R.layout.fragment_category_list, null);
         list = new ArrayList<String>();
         try {
-            mCategoriesList=(ArrayList<Category>) HelperFactory.getHelper().getCathegoryDAO().getAllCategories();
+            ArrayList<Category> mCategoriesList = (ArrayList<Category>) HelperFactory.getHelper().getCathegoryDAO().getAllCategories();
             list.add(getString(R.string.no_category));
             list.add(getString(R.string.all));
-            for(Category category:mCategoriesList){
+            for(Category category: mCategoriesList){
                 list.add(category.getName());
             }
             ArrayAdapter<String> adapter= new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_1, list);
-            mCategoriesListView =(ListView)v.findViewById(R.id.catigoriesListView);
+            ListView mCategoriesListView = (ListView) v.findViewById(R.id.catigoriesListView);
             mCategoriesListView.setAdapter(adapter);
             mCategoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                     mFTrans = getActivity().getFragmentManager().beginTransaction();
-                    String categoryName=list.get(position);
-                    if(categoryName.equals(getString(R.string.no_category))) {
-                        mFragmentBookList= new FragmentBookListNoCategory();
+                    String categoryName = list.get(position);
+                    //create list of books without category
+                    if (categoryName.equals(getString(R.string.no_category))) {
+                        mFragmentBookList = new FragmentBookListNoCategory();
                         mFTrans = getActivity().getFragmentManager().beginTransaction();
                         mFTrans.replace(R.id.fragment, mFragmentBookList)
                                 .commit();
-                    }
-                    else {
+                    } else {
+                        //create list of all books
                         if (categoryName.equals(getString(R.string.all))) {
                             mFragmentBookList = new FragmentBookListAll();
 
@@ -62,6 +60,7 @@ public class FragmentCategoryList extends Fragment {
                             mFTrans.replace(R.id.fragment, mFragmentBookList)
                                     .commit();
                         } else {
+                            //create list of books in chosen category
                             Category category = null;
                             Bundle bundle = new Bundle();
                             try {
@@ -73,25 +72,8 @@ public class FragmentCategoryList extends Fragment {
                             }
                             bundle.putInt("category", category.getId());
                             mFragmentBookList.setArguments(bundle);
-                            if(mDualPane){
-                                FrameLayout frameLayout2 = (FrameLayout) getActivity().findViewById(R.id.fragment_2);
-                                FrameLayout frameLayout = (FrameLayout) getActivity().findViewById(R.id.fragment);
-                                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.MATCH_PARENT, 0.5f);
-                                LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.MATCH_PARENT, 0.5f);
-                                frameLayout.setLayoutParams(param);
-                                frameLayout2.setLayoutParams(param2);
                                 mFTrans.replace(R.id.fragment, mFragmentBookList)
                                         .commit();
-                            }
-                            else {
-                                mFTrans.replace(R.id.fragment, mFragmentBookList)
-                                        .commit();
-                            }
-
                         }
                     }
                 }
@@ -101,6 +83,7 @@ public class FragmentCategoryList extends Fragment {
         }
         return v;
     }
+    //get list of books
     public FragmentBookList getFragmentBookList(){
         return mFragmentBookList;
     }

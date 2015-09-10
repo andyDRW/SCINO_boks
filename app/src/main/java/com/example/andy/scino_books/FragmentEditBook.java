@@ -17,19 +17,15 @@ import java.util.ArrayList;
 
 /**
  * Created by andy on 04.09.15.
+ * edit book data
  */
-public class FragmentEditBook extends DialogFragment {
-    private Button mButtonOk;
+public class FragmentEditBook extends EditFragment {
     private Book mBook;
-    private Button mButtonCancel;
     private EditText mEditName;
     private EditText mEditAuthor;
     private EditText mEditDescription;
     private CheckBox mCheckBoxIsRead;
-    private Spinner mSpinnerCategory;
     private ArrayList<String> mCategoryNames;
-    private ArrayList<Category> mCategories;
-    private ArrayAdapter<String> mSpinnerAdapter;
     private Category mSelectedCategory;
     private Category mCurrentCategory;
     private String mCurrentCategoryName;
@@ -62,9 +58,10 @@ public class FragmentEditBook extends DialogFragment {
         mEditAuthor.setText(mBook.getAuthor());
         mCheckBoxIsRead=(CheckBox)v.findViewById(R.id.checkBoxBookRead);
         mCheckBoxIsRead.setChecked(mBook.getRead());
-        mSpinnerCategory=(Spinner)v.findViewById(R.id.spinnerBookCategory);
+        Spinner mSpinnerCategory = (Spinner) v.findViewById(R.id.spinnerBookCategory);
+        ArrayList<Category> mCategories;
         try {
-            mCategories= (ArrayList<Category>) HelperFactory.getHelper().getCathegoryDAO().getAllCategories();
+            mCategories = (ArrayList<Category>) HelperFactory.getHelper().getCathegoryDAO().getAllCategories();
         } catch (SQLException e) {
             e.printStackTrace();
             return v;
@@ -74,13 +71,13 @@ public class FragmentEditBook extends DialogFragment {
             mCategoryNames.add(mCurrentCategoryName);
         }
         mCategoryNames.add(getString(R.string.no_category));
-        for(Category category:mCategories){
+        for(Category category: mCategories){
             String name=category.getName();
             if(!name.equals(mCurrentCategoryName)) {
                 mCategoryNames.add(name);
             }
         }
-        mSpinnerAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),R.layout.spinner_item, mCategoryNames);
+        ArrayAdapter<String> mSpinnerAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.spinner_item, mCategoryNames);
         mSpinnerCategory.setAdapter(mSpinnerAdapter);
         mSpinnerCategory.setPrompt(getString(R.string.category_str));
         mSpinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -89,12 +86,10 @@ public class FragmentEditBook extends DialogFragment {
                 String categoryName = mCategoryNames.get(position);
                 if (categoryName.equals(getString(R.string.no_category))) {
                     mSelectedCategory = null;
-                }
-                else {
+                } else {
                     try {
                         mSelectedCategory = HelperFactory.getHelper().getCathegoryDAO().getCategoryByName(categoryName);
-                    }
-                    catch (SQLException e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
@@ -105,7 +100,7 @@ public class FragmentEditBook extends DialogFragment {
                 mSelectedCategory = null;
             }
         });
-        mButtonOk = (Button) v.findViewById(R.id.book_ok);
+        Button mButtonOk = (Button) v.findViewById(R.id.book_ok);
         mButtonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +111,7 @@ public class FragmentEditBook extends DialogFragment {
                 if (mSelectedCategory == null) {
                     try {
                         HelperFactory.getHelper().getBookDAO().updateBookNulCategory(bookId, bookName, bookDescription, bookAuthor, bookIsRead);
+                        normalDismiss();
                         dismiss();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -123,8 +119,8 @@ public class FragmentEditBook extends DialogFragment {
                 } else {
 
                     try {
-                        //HelperFactory.getHelper().getBookDAO().create(mBook);
                         HelperFactory.getHelper().getBookDAO().updateBook(bookId, bookName, bookDescription, bookAuthor, bookIsRead, mSelectedCategory);
+                        normalDismiss();
                         dismiss();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -132,10 +128,11 @@ public class FragmentEditBook extends DialogFragment {
                 }
             }
         });
-        mButtonCancel=(Button)v.findViewById(R.id.book_cancel);
+        Button mButtonCancel = (Button) v.findViewById(R.id.book_cancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                normalDismiss();
                 dismiss();
             }
         });

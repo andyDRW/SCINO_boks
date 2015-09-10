@@ -16,9 +16,7 @@ import java.sql.SQLException;
 /**
  * Created by andy on 24.08.15.
  */
-public class FragmentAddCategory extends DialogFragment {
-    private Button mButtonOk;
-    private Button mButtonCancel;
+public class FragmentAddCategory extends EditFragment {
     private EditText mEditName;
     private EditText mEditDescription;
     @Override
@@ -27,15 +25,16 @@ public class FragmentAddCategory extends DialogFragment {
         View v=inflater.inflate(R.layout.fragment_add_category, null);
         mEditName=(EditText)v.findViewById(R.id.editTextCategoryName);
         mEditDescription=(EditText)v.findViewById(R.id.editTextCategoryDescription);
-        mButtonOk=(Button)v.findViewById(R.id.category_ok);
+        Button mButtonOk = (Button) v.findViewById(R.id.category_ok);
         mButtonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String categoryName=mEditName.getText().toString();
-                String categoryDescription=mEditDescription.getText().toString();
-                Category category=new Category(categoryName, categoryDescription);
+                String categoryName = mEditName.getText().toString();
+                String categoryDescription = mEditDescription.getText().toString();
+                Category category = new Category(categoryName, categoryDescription);
                 try {
                     HelperFactory.getHelper().getCathegoryDAO().create(category);
+                    normalDismiss();
                     dismiss();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -43,11 +42,11 @@ public class FragmentAddCategory extends DialogFragment {
 
             }
         });
-        mButtonCancel=(Button)v.findViewById(R.id.category_cancel);
+        Button mButtonCancel = (Button) v.findViewById(R.id.category_cancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
+                dismiss();normalDismiss();
             }
         });
         return v;

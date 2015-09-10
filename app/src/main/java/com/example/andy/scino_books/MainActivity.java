@@ -2,7 +2,6 @@ package com.example.andy.scino_books;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -15,14 +14,12 @@ import android.widget.LinearLayout;
 import java.util.Stack;
 
 
-public class MainActivity extends android.support.v7.app.AppCompatActivity {
+public class MainActivity extends android.support.v7.app.AppCompatActivity  {
 
     private FragmentTransaction mFTrans;
-    private FragmentAddBook mFragmentAddBook;
     private FragmentCategoryList mFragmentCategoryList;
-    private FragmentAddCategory mFragmentAddCategory;
-    private Stack<Fragment> mFragmentsStack;
     private Menu mMenu;
+    //Fragments names
     public static String SHOW_BOOK="FragmentShowBook";
     public static String SHOW_CATEGORY="FragmentBookList";
     public static String SHOW_NO_CATEGORY="FragmentBookListNoCategory";
@@ -32,28 +29,27 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
     public static String EDIT_BOOK="FragmentEditBook";
     public static String DELETE_BOOK="FragmentDeleteBook";
     public static String CATEGORY_LIST="FragmentCategoryList";
+    public static String ADD_CATEGORY="FragmentAddCategory";
+    public static String ADD_BOOK="FragmentAddBook";
+    //name of last attached fragment
     private String mFragmentName;
-    private FragmentDeleteCategory mFragmentDeleteCategory;
-    private FragmentEditCategory mFragmentEditCategory;
-    private FragmentEditBook mFragmentEditBook;
-    private FragmentDeleteBook mFragmentDeleteBook;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mFragmentName= "";
         super.onCreate(savedInstanceState);
-        mFragmentName=new String();
         setContentView(R.layout.activity_main);
         View fragmentView = findViewById(R.id.fragment_2);
         boolean dualPane = fragmentView != null &&
                 fragmentView.getVisibility() == View.VISIBLE;
-        DualPane.setDualPane(dualPane);
-        mFragmentsStack=new Stack<Fragment>();
+        DualPaneSingleton.setDualPane(dualPane);
+        FragmentStackSingleton.setFragmentsStack(new Stack<Fragment>());
         mFragmentCategoryList=new FragmentCategoryList();
         HelperFactory.setHelper(getApplicationContext());
         mFTrans = getFragmentManager().beginTransaction();
         mFTrans.replace(R.id.fragment, mFragmentCategoryList)
                 .commit();
-
     }
 
     @Override
@@ -73,14 +69,14 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_add_book: {
-                mFragmentAddBook = new FragmentAddBook();
+                FragmentAddBook mFragmentAddBook = new FragmentAddBook();
                 mFTrans = getFragmentManager().beginTransaction();
                 mFTrans.replace(R.id.fragment, mFragmentAddBook)
                         .commit();
             }
             break;
             case R.id.action_add_category: {
-                mFragmentAddCategory = new FragmentAddCategory();;
+                FragmentAddCategory mFragmentAddCategory = new FragmentAddCategory();
                 mFTrans = getFragmentManager().beginTransaction();
                 mFTrans.replace(R.id.fragment, mFragmentAddCategory)
                         .commit();
@@ -89,7 +85,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             case R.id.action_edit_book: {
                 if (mFragmentCategoryList != null) {
                     if (mFragmentCategoryList.getFragmentBookList().getFragmentShowBook() != null) {
-                        mFragmentEditBook = new FragmentEditBook();
+                        FragmentEditBook mFragmentEditBook = new FragmentEditBook();
                         int bookId = mFragmentCategoryList.getFragmentBookList().getFragmentShowBook().getBookId();
                         Bundle bundle = new Bundle();
                         bundle.putInt("book", bookId);
@@ -105,7 +101,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
                 if (mFragmentCategoryList != null) {
                     if (mFragmentCategoryList.getFragmentBookList() != null) {
                         if (mFragmentCategoryList.getFragmentBookList().getFragmentShowBook() != null) {
-                            mFragmentDeleteBook = new FragmentDeleteBook();
+                            FragmentDeleteBook mFragmentDeleteBook = new FragmentDeleteBook();
                             int bookId = mFragmentCategoryList.getFragmentBookList().getFragmentShowBook().getBookId();
                             Bundle bundle = new Bundle();
                             bundle.putInt("book", bookId);
@@ -119,7 +115,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             case R.id.action_edit_category: {
                 if (mFragmentCategoryList != null) {
                     if (mFragmentCategoryList.getFragmentBookList() != null) {
-                        mFragmentEditCategory = new FragmentEditCategory();
+                        FragmentEditCategory mFragmentEditCategory = new FragmentEditCategory();
                         int categoryId = mFragmentCategoryList.getFragmentBookList().getCategoryId();
                         Bundle bundle = new Bundle();
                         bundle.putInt("category", categoryId);
@@ -134,7 +130,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             case R.id.action_delete_category: {
                 if (mFragmentCategoryList != null) {
                     if (mFragmentCategoryList.getFragmentBookList() != null) {
-                        mFragmentDeleteCategory = new FragmentDeleteCategory();
+                        FragmentDeleteCategory mFragmentDeleteCategory = new FragmentDeleteCategory();
                         int categoryId = mFragmentCategoryList.getFragmentBookList().getCategoryId();
                         Bundle bundle = new Bundle();
                         bundle.putInt("category", categoryId);
@@ -180,24 +176,28 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
    @Override
    public void onAttachFragment(Fragment fragment){
        mFragmentName=fragment.getClass().getName();
-       if (mFragmentName.contains(EDIT_BOOK)||mFragmentName.contains(EDIT_CATEGORY)
-               ||mFragmentName.contains(CATEGORY_LIST)||mFragmentName.contains(SHOW_CATEGORY)){
-
-                setFrameSize(1.0f, 0);
+       if (mFragmentName.contains(SHOW_BOOK)){
+           //shows book in right column
+           setFrameSize(0.5f, 0.5f);
        }
        else {
+           //in one column
+           setFrameSize(1.0f, 0);
 
-              setFrameSize(0.5f, 0.5f);
        }
-       if(mFragmentsStack!=null) {
-           if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY) || mFragmentName.contains(EDIT_BOOK) || mFragmentName.contains(DELETE_BOOK))) {
-               if (mFragmentsStack.size() == 0) {
-                   mFragmentsStack.push(fragment);
+       Stack <Fragment> fragmentsStack=FragmentStackSingleton.getFragmentsStack();
+       if(fragmentsStack!=null) {
+           if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY)
+                   || mFragmentName.contains(EDIT_BOOK) || mFragmentName.contains(DELETE_BOOK))) {
+               if (fragmentsStack.size() == 0) {
+                   fragmentsStack.push(fragment);
                } else {
-                   if (!fragment.equals(mFragmentsStack.peek())&&(mFragmentsStack.peek().getClass().getName().compareTo(fragment.getClass().getName())!=0))
-                       mFragmentsStack.push(fragment);
+                   if (!fragment.equals(fragmentsStack.peek()) &&(fragmentsStack.peek().getClass()
+                           .getName().compareTo(fragment.getClass().getName())!=0))
+                       fragmentsStack.push(fragment);
                }
            }
+           FragmentStackSingleton.setFragmentsStack(fragmentsStack);
 
        }
        groupsVisibility(mFragmentName);
@@ -205,11 +205,11 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
    }
     @Override
     public void onBackPressed() {
-        if(mFragmentName.contains(SHOW_BOOK)){
-
-                setFrameSize(1.0f,0);
+        if(mFragmentName.contains(SHOW_BOOK)||(mFragmentName.contains(DELETE_BOOK))){
+                setFrameSize(1.0f, 0);
             }
-       if(mFragmentsStack.size()<=1){
+        Stack <Fragment> fragmentsStack=FragmentStackSingleton.getFragmentsStack();
+       if(fragmentsStack.size()<=1){
             new AlertDialog.Builder(this)
                     .setTitle(R.string.exit)
                     .setMessage(R.string.exit_message)
@@ -222,14 +222,16 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         }
         else {
            mFTrans = getFragmentManager().beginTransaction();
-           mFTrans.detach(mFragmentsStack.pop())
-           .replace(R.id.fragment, mFragmentsStack.peek())
+           mFTrans.detach(fragmentsStack.pop())
+                   .replace(R.id.fragment, fragmentsStack.peek())
                    .commit();
-           groupsVisibility(mFragmentsStack.peek().getClass().getName());
+           groupsVisibility(fragmentsStack.peek().getClass().getName());
+           FragmentStackSingleton.setFragmentsStack(fragmentsStack);
         }
    }
+
     public void setFrameSize(float fragmetnWeigth_1,float fragmetnWeigth_2){
-        if(DualPane.getDualPane()) {
+        if(DualPaneSingleton.getDualPane()) {
             FrameLayout frameLayout2 = (FrameLayout) findViewById(R.id.fragment_2);
             FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fragment);
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
@@ -238,8 +240,10 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
             LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT, fragmetnWeigth_1);
-            frameLayout.setLayoutParams(param);
-            frameLayout2.setLayoutParams(param2);
+            if(frameLayout!=null)
+                frameLayout.setLayoutParams(param);
+            if(frameLayout2!=null)
+                frameLayout2.setLayoutParams(param2);
         }
     }
     public void groupsVisibility(String fragmentName){
@@ -263,16 +267,12 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity {
         }
 
     }
-    @Override
-    protected void onSaveInstanceState(Bundle outState){
-        DualPane.setDualPane(!DualPane.getDualPane());
-        mFragmentsStack.peek();
-        int i=1;
-    }
+
     @Override
     public void onDestroy() {
-        HelperFactory.releaseHelper();
         super.onDestroy();
+      HelperFactory.releaseHelper();
+
     }
 
 }

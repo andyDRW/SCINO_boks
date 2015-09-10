@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Книги SCINO</string>
+    <string name="action_settings">Настройки</string>
+    <string name="add">Добавить</string>
+    <string name="add_book">Добавить книгу</string>
+    <string name="add_category">Добавит категорию</string>
+    <string name="book_name">Название</string>
+    <string name="book_description">Описание</string>
+    <string name="book_author">Автор</string>
+    <string name="book_category">Категория</string>
+    <string name="book_read">Прочитанная</string>
+    <string name="category_name">Название</string>
+    <string name="category_description">Описание</string>
+    <string name="cancel_btn">Отмена</string>
+    <string name="ok_btn">OK</string>
+    <string name="no_category">Без категории</string>
+    <string name="no_category_description">Книги без категории</string>
+    <string name="category_str">Категория</string>
+    <string name="all">Все книги</string>
+    <string name="all_description">Список со всеми книгами</string>
+    <string name="exit">Выход из Книги SCINO</string>
+    <string name="exit_message">Вы хотите покинуть Книги SCINO?</string>
+    <string name="delete_category_message">Вы хотите удалить эту категорию?</string>
+    <string name="delete_category">Удалить категорию</string>
+    <string name="delete_book_message">Вы хотите удалить эту книгу?</string>
+    <string name="delete_book">Удалить книгу</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="sort">Сортироватть книги</string>
+    <string name="sort_by_name">По имени</string>
+    <string name="sort_by_author">По автору</string>
+    <string name="show_books">Показать книги</string>
+    <string name="show_all_books">Все книги</string>
+    <string name="show_read">Прочитанные книги</string>
+    <string name="show_not_read">Непрочитанные книги</string>
+</resources>

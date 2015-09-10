@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 /**
  * Created by andy on 07.09.15.
+ * view holder for book list
  */
 public class BookViewHolder  {
     private CheckBox checkBox ;

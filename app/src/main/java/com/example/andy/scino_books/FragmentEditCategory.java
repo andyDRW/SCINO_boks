@@ -12,13 +12,13 @@ import java.sql.SQLException;
 
 /**
  * Created by andy on 04.09.15.
+ * edits category's data
  */
-public class FragmentEditCategory extends DialogFragment {
-    private Button mButtonOk;
-    private Button mButtonCancel;
+
+public class FragmentEditCategory extends EditFragment {
     private EditText mEditName;
     private EditText mEditDescription;
-    private Category mCategory;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -26,19 +26,20 @@ public class FragmentEditCategory extends DialogFragment {
         Bundle bundle=getArguments();
         final int categoryId=bundle.getInt("category");
         try {
-            mCategory=(Category)HelperFactory.getHelper().getCathegoryDAO().queryForId(categoryId);
+            Category mCategory = (Category) HelperFactory.getHelper().getCathegoryDAO().queryForId(categoryId);
             mEditName=(EditText)v.findViewById(R.id.editTextCategoryName);
             mEditName.setText(mCategory.getName());
             mEditDescription=(EditText)v.findViewById(R.id.editTextCategoryDescription);
             mEditDescription.setText(mCategory.getDescription());
-            mButtonOk=(Button)v.findViewById(R.id.category_ok);
+            Button mButtonOk = (Button) v.findViewById(R.id.category_ok);
             mButtonOk.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String categoryName=mEditName.getText().toString();
-                    String categoryDescription=mEditDescription.getText().toString();
+                    String categoryName = mEditName.getText().toString();
+                    String categoryDescription = mEditDescription.getText().toString();
                     try {
-                        HelperFactory.getHelper().getCathegoryDAO().updateCategory(categoryName,categoryDescription,categoryId);
+                        HelperFactory.getHelper().getCathegoryDAO().updateCategory(categoryName, categoryDescription, categoryId);
+                        normalDismiss();
                         dismiss();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -46,10 +47,11 @@ public class FragmentEditCategory extends DialogFragment {
 
                 }
             });
-            mButtonCancel=(Button)v.findViewById(R.id.category_cancel);
+            Button mButtonCancel = (Button) v.findViewById(R.id.category_cancel);
             mButtonCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    normalDismiss();
                     dismiss();
                 }
             });
