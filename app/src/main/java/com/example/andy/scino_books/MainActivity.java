@@ -44,12 +44,44 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         boolean dualPane = fragmentView != null &&
                 fragmentView.getVisibility() == View.VISIBLE;
         DualPaneSingleton.setDualPane(dualPane);
-        FragmentStackSingleton.setFragmentsStack(new Stack<Fragment>());
-        mFragmentCategoryList=new FragmentCategoryList();
         HelperFactory.setHelper(getApplicationContext());
-        mFTrans = getFragmentManager().beginTransaction();
-        mFTrans.replace(R.id.fragment, mFragmentCategoryList)
-                .commit();
+        if(FragmentStackSingleton.size()==0){
+            FragmentStackSingleton.setFragmentsStack(new Stack<Fragment>());
+            mFragmentCategoryList=new FragmentCategoryList();
+            mFTrans = getFragmentManager().beginTransaction();
+            mFTrans.replace(R.id.fragment, mFragmentCategoryList)
+                    .commit();
+        }
+        else {
+            Fragment fragment=FragmentStackSingleton.peek();
+            mFTrans = getFragmentManager().beginTransaction();
+            if((fragment.getClass().getName().contains(SHOW_BOOK))&&(DualPaneSingleton.getDualPane())){
+                setFrameSize(0.5f, 0.5f);
+                mFTrans.remove(FragmentStackSingleton.peek())
+                        .commit();
+                getFragmentManager().executePendingTransactions();
+                mFTrans=getFragmentManager().beginTransaction();
+                mFTrans
+                        .replace(R.id.fragment_2, FragmentStackSingleton.pop())
+                        .replace(R.id.fragment, FragmentStackSingleton.peek())
+                        .commit();
+            }
+            else {
+                //mFTrans.detach(fragmentStack.peek());
+                //Fragment newInstance = recreateFragment(fragment);
+
+                setFrameSize(1.0f, 0);
+                mFTrans.remove(FragmentStackSingleton.peek())
+                        .commit();
+                getFragmentManager().executePendingTransactions();
+                mFTrans=getFragmentManager().beginTransaction();
+                mFTrans = getFragmentManager().beginTransaction();
+                mFTrans
+                        .replace(R.id.fragment, FragmentStackSingleton.peek())
+                        .commit();
+            }
+        }
+
     }
 
     @Override
@@ -173,6 +205,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         }
         return super.onOptionsItemSelected(item);
     }
+
    @Override
    public void onAttachFragment(Fragment fragment){
        mFragmentName=fragment.getClass().getName();
@@ -185,21 +218,17 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
            setFrameSize(1.0f, 0);
 
        }
-       Stack <Fragment> fragmentsStack=FragmentStackSingleton.getFragmentsStack();
-       if(fragmentsStack!=null) {
+
            if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY)
                    || mFragmentName.contains(EDIT_BOOK) || mFragmentName.contains(DELETE_BOOK))) {
-               if (fragmentsStack.size() == 0) {
-                   fragmentsStack.push(fragment);
+               if (FragmentStackSingleton.size() == 0) {
+                   FragmentStackSingleton.push(fragment);
                } else {
-                   if (!fragment.equals(fragmentsStack.peek()) &&(fragmentsStack.peek().getClass()
+                   if (!fragment.equals(FragmentStackSingleton.peek()) &&(FragmentStackSingleton.peek().getClass()
                            .getName().compareTo(fragment.getClass().getName())!=0))
-                       fragmentsStack.push(fragment);
+                       FragmentStackSingleton.push(fragment);
                }
            }
-           FragmentStackSingleton.setFragmentsStack(fragmentsStack);
-
-       }
        groupsVisibility(mFragmentName);
        super.onAttachFragment(fragment);
    }
@@ -208,8 +237,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         if(mFragmentName.contains(SHOW_BOOK)||(mFragmentName.contains(DELETE_BOOK))){
                 setFrameSize(1.0f, 0);
             }
-        Stack <Fragment> fragmentsStack=FragmentStackSingleton.getFragmentsStack();
-       if(fragmentsStack.size()<=1){
+       if(FragmentStackSingleton.size()<=1){
             new AlertDialog.Builder(this)
                     .setTitle(R.string.exit)
                     .setMessage(R.string.exit_message)
@@ -222,11 +250,10 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         }
         else {
            mFTrans = getFragmentManager().beginTransaction();
-           mFTrans.detach(fragmentsStack.pop())
-                   .replace(R.id.fragment, fragmentsStack.peek())
+           mFTrans.detach(FragmentStackSingleton.pop())
+                   .replace(R.id.fragment, FragmentStackSingleton.peek())
                    .commit();
-           groupsVisibility(fragmentsStack.peek().getClass().getName());
-           FragmentStackSingleton.setFragmentsStack(fragmentsStack);
+           groupsVisibility(FragmentStackSingleton.peek().getClass().getName());
         }
    }
 

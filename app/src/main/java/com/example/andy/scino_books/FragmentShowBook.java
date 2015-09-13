@@ -16,15 +16,19 @@ import java.sql.SQLException;
  */
 public class FragmentShowBook extends DialogFragment {
     private Book mBook;
+    private int mId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v=inflater.inflate(R.layout.fragment_show_book, null);
         Bundle bundle = getArguments();
-        int id = bundle.getInt("book", 1);
+        if (bundle==null){
+            bundle=savedInstanceState;
+        }
+        mId = bundle.getInt("book", 1);
         try {
-            mBook=HelperFactory.getHelper().getBookDAO().getBookByID(id);
+            mBook=HelperFactory.getHelper().getBookDAO().getBookByID(mId);
             Category mCategory = mBook.getCategory();
             HelperFactory.getHelper().getCathegoryDAO().refresh(mCategory);
             TextView mTextViewBookName = (TextView) v.findViewById(R.id.textViewBookName);
@@ -52,4 +56,9 @@ public class FragmentShowBook extends DialogFragment {
         return mBook.getId();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("book",mId);
+        super.onSaveInstanceState(outState);
+    }
 }
