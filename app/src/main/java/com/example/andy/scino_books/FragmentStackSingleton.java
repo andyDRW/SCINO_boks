@@ -14,6 +14,9 @@ public class FragmentStackSingleton {
     private static Stack<Fragment> mFragmentsStack=new Stack<Fragment>();
     private FragmentStackSingleton(){
     }
+    public static Fragment get(int location){
+        return mFragmentsStack.get(location);
+    }
     public static Stack <Fragment> getFragmentsStack(){
         return mFragmentsStack;
     }

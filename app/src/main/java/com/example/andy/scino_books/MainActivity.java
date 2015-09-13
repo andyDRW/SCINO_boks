@@ -53,6 +53,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
                     .commit();
         }
         else {
+            mFragmentCategoryList=(FragmentCategoryList)FragmentStackSingleton.get(0);
             Fragment fragment=FragmentStackSingleton.peek();
             mFTrans = getFragmentManager().beginTransaction();
             if((fragment.getClass().getName().contains(SHOW_BOOK))&&(DualPaneSingleton.getDualPane())){
@@ -80,6 +81,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
                         .replace(R.id.fragment, FragmentStackSingleton.peek())
                         .commit();
             }
+  //          groupsVisibility( FragmentStackSingleton.peek().getClass().getName());
         }
 
     }
@@ -89,6 +91,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu=menu;
+        groupsVisibility( mFragmentName);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -218,17 +221,17 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
            setFrameSize(1.0f, 0);
 
        }
-
-           if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY)
+       if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY)
                    || mFragmentName.contains(EDIT_BOOK) || mFragmentName.contains(DELETE_BOOK))) {
-               if (FragmentStackSingleton.size() == 0) {
+           if (FragmentStackSingleton.size() == 0) {
                    FragmentStackSingleton.push(fragment);
-               } else {
+           }
+           else {
                    if (!fragment.equals(FragmentStackSingleton.peek()) &&(FragmentStackSingleton.peek().getClass()
                            .getName().compareTo(fragment.getClass().getName())!=0))
                        FragmentStackSingleton.push(fragment);
-               }
            }
+       }
        groupsVisibility(mFragmentName);
        super.onAttachFragment(fragment);
    }
