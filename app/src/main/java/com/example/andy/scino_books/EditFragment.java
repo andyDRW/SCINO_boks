@@ -14,13 +14,11 @@ import java.util.Stack;
 public class EditFragment extends DialogFragment {
 
     public void normalDismiss() {
-       Stack<Fragment> fragmentStack=FragmentStackSingleton.getFragmentsStack();
-        FragmentTransaction mFTrans = getFragmentManager().beginTransaction();
-        if(fragmentStack.size()>1) {
-                mFTrans.detach(fragmentStack.pop());
-        }
-        mFTrans.replace(R.id.fragment, fragmentStack.peek());
-        mFTrans.commit();
-        FragmentStackSingleton.setFragmentsStack(fragmentStack);
+        FragmentTransaction FTrans = getFragmentManager().beginTransaction();
+        FragmentStackSingleton.pop();
+        getFragmentManager().executePendingTransactions();
+        FTrans.replace(R.id.fragment, FragmentStackSingleton.peek())
+        .commit();
+
     }
 }

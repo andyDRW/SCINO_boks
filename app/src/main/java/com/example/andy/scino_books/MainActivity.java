@@ -221,8 +221,7 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
            setFrameSize(1.0f, 0);
 
        }
-       if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(EDIT_CATEGORY)
-                   || mFragmentName.contains(EDIT_BOOK) || mFragmentName.contains(DELETE_BOOK))) {
+       if (!(mFragmentName.contains(DELETE_CATEGORY) || mFragmentName.contains(DELETE_BOOK))) {
            if (FragmentStackSingleton.size() == 0) {
                    FragmentStackSingleton.push(fragment);
            }
@@ -253,8 +252,9 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity  {
         }
         else {
            mFTrans = getFragmentManager().beginTransaction();
-           mFTrans.detach(FragmentStackSingleton.pop())
-                   .replace(R.id.fragment, FragmentStackSingleton.peek())
+           FragmentStackSingleton.pop();
+           mFTrans
+                .replace(R.id.fragment, FragmentStackSingleton.peek())
                    .commit();
            groupsVisibility(FragmentStackSingleton.peek().getClass().getName());
         }

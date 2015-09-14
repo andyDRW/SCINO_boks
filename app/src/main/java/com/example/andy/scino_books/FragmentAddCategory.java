@@ -34,7 +34,7 @@ public class FragmentAddCategory extends EditFragment {
                 Category category = new Category(categoryName, categoryDescription);
                 try {
                     HelperFactory.getHelper().getCathegoryDAO().create(category);
-                    normalDismiss();
+                   normalDismiss();
                     dismiss();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -46,7 +46,8 @@ public class FragmentAddCategory extends EditFragment {
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();normalDismiss();
+                dismiss();
+                 normalDismiss();
             }
         });
         return v;
